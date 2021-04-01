@@ -1,6 +1,6 @@
-from .. import app, db,login_manager
+from .. import app, db, login_manager
 from flask import request, current_app, jsonify, make_response
-from ..models import Account, Student, Course, StuCourse, Admin, Instructor
+from ..models import Account, Student, Course, StuCourse, Admin, Instructor, AnonymousUser
 from flask_login import login_user, logout_user, current_user, login_required
 from . import main
 import json
@@ -24,6 +24,7 @@ def login():
     account = data.get('account')
     password = data.get('password')
     remember_me = True
+    print("hello")
     if account is None or password is None or remember_me is None:
         return jsonify({'message': 'data missing'}), 400
     user = Account.query.filter_by(account=account).first()
@@ -73,7 +74,7 @@ def change_passwd():
         return jsonify({'message': 'password error'}), 403
 
 
-@main.route('/who_am_i')
+@main.route('/who_am_i', methods=['GET'])
 @login_required
 def who_am_i():
     print("hi!")
