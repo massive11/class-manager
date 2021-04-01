@@ -5,12 +5,76 @@ from datetime import datetime
 
 
 # 账户表
-class User(db.Model, UserMixin):
-    __tablename__ = 'users'
-    uid = db.Column(db.String(13), unique=True, primary_key=True, index=True)
-    username = db.Column(db.String(20), nullable=False)
+class Account(UserMixin, AnonymousUserMixin, db.Model):
+    __tablename__ = 'accounts'
+    account = db.Column(
+        db.String(32),
+        unique=True,
+        primary_key=True,
+        nullable=False,
+        index=True)
     password = db.Column(db.String(32), nullable=False)
-    type = db.Column(db.Integer, nullable=False)  # 用户属性： 0.admin 1.student 2.instructor
+    type = db.Column(db.String(16), nullable=False)
+
+    def show(self):
+        return [self.account, self.password, self.type]
+
+
+@login_manager.user_loader
+def load_user(account):
+    account = Account.query.get(int(account))
+    if account.type == 'student':
+        return Student.query.get(int(account.account))
+    elif account.type == 'instructor':
+        return Instructor.query.get(int(account.account))
+    elif account.type == 'admin':
+        return Admin.query.get(int(account.account))
+    elif account in app.config['FLASKY_ADMIN']:
+        return account
+
+
+class AnonymousUser(AnonymousUserMixin):
+    def can(self):
+        return False
+
+    def is_admin(self):
+        return False
+
+
+# 学生表
+class Student(db.Model, UserMixin, AnonymousUserMixin):
+    __tablename__ = 'students'
+    id = db.Column(
+        db.String(32),
+        unique=True,
+        primary_key=True,
+        nullable=False,
+        index=True)
+    name = db.Column(db.String(32), nullable=False)
+    year = db.Column(db.Integer, nullable=False)
+
+    def show(self):
+        return [self.id, self.name, self.year]
+
+
+# 教师表
+class Instructor(db.Model, UserMixin, AnonymousUserMixin):
+    __tablename__ = 'instructors'
+    id = db.Column(db.String(32), primary_key=True, nullable=False, index=True)
+    name = db.Column(db.String(32), nullable=False)
+
+    def show(self):
+        return [self.id, self.name]
+
+
+# 管理员表
+class Admin(db.Model, UserMixin, AnonymousUserMixin):
+    __tablename__ = 'admins'
+    id = db.Column(db.String(32), primary_key=True, nullable=False, index=True)
+    name = db.Column(db.String(32), nullable=False)
+
+    def show(self):
+        return [self.id, self.name]
 
 
 # 课程表
@@ -19,14 +83,6 @@ class Course(db.Model):
     course_id = db.Column(db.String(13), unique=True, primary_key=True, index=True)
     course_name = db.Column(db.String(32), nullable=False)
     teacher_id = db.Column(db.String(13), unique=True, primary_key=True, index=True)
-
-
-# # 教师-课堂表
-# class TeaCourse(db.Model):
-#     __tablename__ = 'tea_courses'
-#     # 教师id和课程id共同作为主键
-#     course_id = db.Column(db.String(6), primary_key=True)
-#     uid = db.Column(db.String(13), primary_key=True, nullable=False)
 
 
 # 学生-课堂表

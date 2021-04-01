@@ -1,6 +1,6 @@
 from .. import app, db,login_manager
 from flask import request, current_app, jsonify, make_response
-from ..models import User, StuCourse, Course
+from ..models import Account, Student, Course, StuCourse, Admin, Instructor
 from flask_login import login_user, logout_user, current_user, login_required
 from . import main
 import json
@@ -26,19 +26,19 @@ def login():
     remember_me = True
     if account is None or password is None or remember_me is None:
         return jsonify({'message': 'data missing'}), 400
-    user = User.query.filter_by(account=account).first()
+    user = Account.query.filter_by(account=account).first()
     if user is not None:
         if user.password == password:
             if user.type == 'student':
-                s = User.query.filter_by(id=account).first()
+                s = Student.query.filter_by(id=account).first()
                 login_user(s, remember_me)
                 return jsonify({'type': 'student'})
             if user.type == 'instructor':
-                i = User.query.filter_by(id=account).first()
+                i = Instructor.query.filter_by(id=account).first()
                 login_user(i, remember=remember_me)
                 return jsonify({'type': 'instructor'})
             if user.type == 'admin':
-                a = User.query.filter_by(id=account).first()
+                a = Admin.query.filter_by(id=account).first()
                 login_user(a, remember_me)
                 return jsonify({'type': 'admin'})
             if account in app.config['FLASKY_ADMIN']:
@@ -56,21 +56,21 @@ def logout():
     return jsonify({'message': 'logout successful'})
 
 
-# @main.route('/change_passwd', methods=['GET', 'POST'])
-# @login_required
-# def change_passwd():
-#     data = request.form
-#     u_account = Account.query.filter_by(account = current_user.id).first()
-#     old_password = u_account.password
-#     if old_password is None:
-#         return jsonify({'message': 'no account'}), 404
-#     if old_password == data.get('old_password'):
-#         u_account.password = data['new_password']
-#         db.session.add(u_account)
-#         db.session.commit()
-#         return jsonify({'message': 'change successful'})
-#     else:
-#         return jsonify({'message': 'password error'}), 403
+@main.route('/change_passwd', methods=['GET', 'POST'])
+@login_required
+def change_passwd():
+    data = request.form
+    u_account = Account.query.filter_by(account=current_user.id).first()
+    old_password = u_account.password
+    if old_password is None:
+        return jsonify({'message': 'no account'}), 404
+    if old_password == data.get('old_password'):
+        u_account.password = data['new_password']
+        db.session.add(u_account)
+        db.session.commit()
+        return jsonify({'message': 'change successful'})
+    else:
+        return jsonify({'message': 'password error'}), 403
 
 
 @main.route('/who_am_i')
@@ -78,6 +78,6 @@ def logout():
 def who_am_i():
     print("hi!")
     print(current_user.id)
-    return jsonify({"type": User.query.filter_by(account=current_user.id).first().type,
+    return jsonify({"type": Account.query.filter_by(account=current_user.id).first().type,
                     "name": current_user.name})
 
