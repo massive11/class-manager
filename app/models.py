@@ -22,18 +22,11 @@ class Account(UserMixin, AnonymousUserMixin, db.Model):
     def is_authenticated(self):
         return True
 
+    def is_active(self):
+        return True
 
-@login_manager.user_loader
-def load_user(account):
-    account = Account.query.get(int(account))
-    if account.type == 'student':
-        return Student.query.get(int(account.account))
-    elif account.type == 'instructor':
-        return Instructor.query.get(int(account.account))
-    elif account.type == 'admin':
-        return Admin.query.get(int(account.account))
-    elif account in app.config['FLASKY_ADMIN']:
-        return account
+    def is_anonymous(self):
+        return False
 
 
 class AnonymousUser(AnonymousUserMixin):

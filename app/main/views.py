@@ -8,6 +8,20 @@ import json
 login_manager.login_view = 'main.no_login'
 
 
+@login_manager.user_loader
+def load_user(account):
+    print("This is ...")
+    account = Account.query.get(int(account))
+    if account.type == 'student':
+        return Student.query.get(int(account.account))
+    elif account.type == 'instructor':
+        return Instructor.query.get(int(account.account))
+    elif account.type == 'admin':
+        return Admin.query.get(int(account.account))
+    elif account in app.config['FLASKY_ADMIN']:
+        return account
+
+
 @main.route('/')
 def hello():
     return 'hello world'
@@ -33,6 +47,7 @@ def login():
             if user.type == 'student':
                 s = Student.query.filter_by(id=account).first()
                 a = login_user(s, remember=remember_me)
+                print(current_user.id)
                 return jsonify({'type': 'student'})
             if user.type == 'instructor':
                 i = Instructor.query.filter_by(id=account).first()
