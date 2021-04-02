@@ -22,13 +22,14 @@ def create_app(config_name):
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    # from.student import student as student_blueprint
-    #
-    # app.register_blueprint(student_blueprint, url_prefix='/student')
-    #
-    # from .teacher import teacher as teacher_blueprint
-    # app.register_blueprint(teacher_blueprint, url_prefix='/teacher')
-    #
-    # from .admin import admin as admin_blueprint
-    # app.register_blueprint(admin_blueprint, url_prefix='/admin')
+    from.student import student as student_blueprint
+
+    app.register_blueprint(student_blueprint, url_prefix='/student')
+
+    from .teacher import teacher as teacher_blueprint
+    app.register_blueprint(teacher_blueprint, url_prefix='/teacher')
+
+    from .admin import admin as admin_blueprint
+    app.register_blueprint(admin_blueprint, url_prefix='/admin')
     return app
+

@@ -19,6 +19,9 @@ class Account(UserMixin, AnonymousUserMixin, db.Model):
     def show(self):
         return [self.account, self.password, self.type]
 
+    def is_authenticated(self):
+        return True
+
 
 @login_manager.user_loader
 def load_user(account):

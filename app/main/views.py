@@ -32,15 +32,14 @@ def login():
         if user.password == password:
             if user.type == 'student':
                 s = Student.query.filter_by(id=account).first()
-                login_user(s, remember_me)
+                a = login_user(s, remember=remember_me)
                 return jsonify({'type': 'student'})
             if user.type == 'instructor':
                 i = Instructor.query.filter_by(id=account).first()
-                login_user(i, remember=remember_me)
                 return jsonify({'type': 'instructor'})
             if user.type == 'admin':
                 a = Admin.query.filter_by(id=account).first()
-                login_user(a, remember_me)
+                login_user(a, remember=remember_me)
                 return jsonify({'type': 'admin'})
             if account in app.config['FLASKY_ADMIN']:
                 login_user(user, remember=remember_me)
@@ -48,6 +47,15 @@ def login():
             return jsonify({'message': 'type error'}), 400
         return jsonify({'message': 'password error'}), 403
     return jsonify({'message': 'no account'}), 404
+
+
+@main.route('/who_am_i', methods=['GET'])
+@login_required
+def who_am_i():
+    print("hi!")
+    print(current_user.id)
+    return jsonify({"type": Account.query.filter_by(account=current_user.id).first().type,
+                    "name": current_user.name})
 
 
 @main.route('/logout', methods=['GET'])
@@ -74,11 +82,5 @@ def change_passwd():
         return jsonify({'message': 'password error'}), 403
 
 
-@main.route('/who_am_i', methods=['GET'])
-@login_required
-def who_am_i():
-    print("hi!")
-    print(current_user.id)
-    return jsonify({"type": Account.query.filter_by(account=current_user.id).first().type,
-                    "name": current_user.name})
+
 
