@@ -28,6 +28,9 @@ class Account(UserMixin, AnonymousUserMixin, db.Model):
     def is_anonymous(self):
         return False
 
+    def get_id(self):
+        return self.account
+
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self):

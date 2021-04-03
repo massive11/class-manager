@@ -38,7 +38,6 @@ def login():
     account = data.get('account')
     password = data.get('password')
     remember_me = True
-    print("hello")
     if account is None or password is None or remember_me is None:
         return jsonify({'message': 'data missing'}), 400
     user = Account.query.filter_by(account=account).first()
@@ -47,7 +46,7 @@ def login():
             if user.type == 'student':
                 s = Student.query.filter_by(id=account).first()
                 a = login_user(s, remember=remember_me)
-                print(current_user.id)
+                print("Hello "+current_user.id)
                 return jsonify({'type': 'student'})
             if user.type == 'instructor':
                 i = Instructor.query.filter_by(id=account).first()
@@ -62,6 +61,25 @@ def login():
             return jsonify({'message': 'type error'}), 400
         return jsonify({'message': 'password error'}), 403
     return jsonify({'message': 'no account'}), 404
+
+
+@main.route('/register', methods=['POST'])
+def register():
+    data = request.form
+    account = data.get('account')
+    name = data.get('name')
+    password = data.get('password')
+    user = Account.query.filter_by(account=account).first()
+    if user is None:
+        user = Account(account=account, password=password, type='student')
+        u = Student(id=account, name=name, year=2017)
+        db.session.add(user)
+        db.session.add(u)
+        db.session.commit()
+        print("用户"+account+"注册成功！")
+        return jsonify({'type': 'student'})
+    else:
+        return jsonify({'message': 'account exists'}), 400
 
 
 @main.route('/who_am_i', methods=['GET'])

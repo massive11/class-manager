@@ -3,6 +3,7 @@ const Host = 'http://127.0.0.1:5000';
 const URLs = {
     hello_world: Host + '/',
     login: Host + '/login',
+    register: Host + '/register',
     who_am_i: Host + '/who_am_i',
     change_passwd: Host + '/change_passwd',
     logout: Host + '/logout',
@@ -74,6 +75,33 @@ const Actions = {
                     alert('账户或密码错误，请确认后重试！');
                 else if (404 === jqXHR.status)
                     alert('账号不存在，请确认后重试！');
+                else
+                    alert('未知错误，请稍后重试！');
+            }
+        });
+    },
+    register: function() {
+        const post_data = {
+            'account': $('#account-register').val(),
+            'name': $('#name-register').val(),
+            'password': $('#passwd-register').val()
+        };
+        $.ajax({
+            xhrFields: {
+                withCredentials: true
+            },
+            url: URLs.register,
+            type: 'POST',
+            data: post_data,
+            complete: function(jqXHR) {
+                if (200 === jqXHR.status) {
+                    const data = JSON.parse(jqXHR.responseText);
+                    if ('student' === data.type.toString())
+                        alert('注册成功！点击确定以跳转登录页面');
+                        window.location.href = './login.html';
+                }
+                else if (400 === jqXHR.status)
+                    alert('账号已存在！请核对账号重新注册或跳转登录页面');
                 else
                     alert('未知错误，请稍后重试！');
             }
@@ -819,6 +847,22 @@ function login() {
     // 善后，清空输入框
     account_input.val('');
     passwd_input.val('')
+}
+function register() {
+    const account_register = $('#account-register');
+    const name_register = $('#name-register');
+    const passwd_register = $('#passwd-register');
+    // 参数检查
+    if (!account_register.val() || !passwd_register.val()||!name_register.val()) {
+        alert('注册信息不全，请将账号、姓名和密码填写完整后重试！');
+        return;
+    }
+    // 登录
+    Actions.register();
+    // 善后，清空输入框
+    account_register.val('');
+    name_register.val('');
+    passwd_register.val('')
 }
 function who_am_i() {
     Actions.who_am_i();
