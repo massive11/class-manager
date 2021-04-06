@@ -13,6 +13,7 @@ const URLs = {
     stu_exam_info: Host + '/student/exam_info',
     stu_classes_list: Host + '/student/class_list',  // classes_list
     stu_change_selected: Host + '/student/choice_class',
+    stu_search: Host + 'student/join_class',
 
     tea_mine_class: Host + '/teacher/mine_class',
     tea_class_info: Host + '/teacher/class_info',
@@ -201,6 +202,28 @@ const Actions = {
         });
         return data;
     },
+    stu_search: function (){
+        let data = [];
+        $.ajax({
+            xhrFields: {
+                withCredentials: true
+            },
+            url: URLs.stu_search,
+            type: 'GET',
+            async: false,
+            complete: function(jqXHR) {
+                if (200 === jqXHR.status) {
+                    data = JSON.parse(jqXHR.responseText);
+                }
+                else if (400 === jqXHR.status) {
+                    alert('该课程号不存在，请重新搜索！')
+                }
+                else
+                    alert('未知错误，请稍后重试！');
+            }
+        });
+        return data;
+    },
     stu_mine_grade: function() {
         let data = [];
         $.ajax({
@@ -352,16 +375,16 @@ const Actions = {
         });
         return data;
     },
-    tea_class_people: function(class_id) {
+    tea_class_people: function(course_id) {
         let data = [];
         $.ajax({
             xhrFields: {
                 withCredentials: true
             },
-            url: URLs.tea_class_people + '/' + class_id,
+            url: URLs.tea_class_people + '/' + course_id,
             type: 'GET',
             data: {
-                'class_id': class_id
+                'course_id': course_id
             },
             async: false,
             complete: function(jqXHR) {
@@ -905,6 +928,9 @@ function stu_mine_class() {
     });
     $('#mine_class-table tbody').show();
 }
+function stu_search() {
+    Actions.stu_search();
+}
 function stu_mine_grade() {
     let mine_grade = Actions.stu_mine_grade();
     for (let i in mine_grade) {
@@ -954,10 +980,6 @@ function stu_change_selected(class_id) {
 
 function tea_mine_class() {
     let data = Actions.tea_mine_class();
-    for (let i in data) {
-        data[i].day = Tools.get_weekday(data[i].day);
-        data[i].section = Tools.get_section(data[i].section);
-    }
     new Vue({
         el: '#mine_class-table',
         data: {
@@ -982,40 +1004,29 @@ function tea_load_classes_list() {
     }
 }
 function tea_students_list() {
-    const class_id = get_url_param('class_id');
+    const course_id = get_url_param('course_id');
 
     // Class info.
     let data = Actions.tea_class_info();
     let class_info = new Vue({
         el: '#class_info-table',
         data: {
-            class_id: '',
             course_id: '',
             course_name: '',
-            type: '',
-            classroom_id: '',
-            time: '',
             students_count: '--'
         }
     });
     for (let i in data) {
-        if (class_id === data[i]['class_id']) {
-            class_info.$data.class_id = data[i]['class_id'];
+        if (course_id === data[i]['course_id']) {
             class_info.$data.course_id = data[i]['course_id'];
             class_info.$data.course_name = data[i]['course_name'];
-            class_info.$data.type = Tools.get_course_type(data[i]['type']);
-            class_info.$data.classroom_id = data[i]['classroom_id'];
-            let time_info = '';
-            for (let j in data[i]['time'])
-                time_info += Tools.get_weekday(data[i]['time'][j]['day']) + ' ' + Tools.get_section(data[i]['time'][j]['section']) + '，';
-            class_info.$data.time = time_info;
             break;
         }
     }
     $('#class_info-table tbody').show();
 
     // Students List.
-    data = Actions.tea_class_people(class_id);
+    data = Actions.tea_class_people(course_id);
     class_info.$data.students_count = data.length;
     for (let i in data) {
         data[i].grade_class = Tools.get_grade_class(data[i].grade);

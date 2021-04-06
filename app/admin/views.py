@@ -89,9 +89,9 @@ def change_account():
         post_passwd = detail.get('passwd')
         if post_account is None or post_type is None or post_name is None or post_passwd is None:
             return jsonify({'message': 'data missing'}), 403
-        insert_account = Account(account=post_account,type=post_type,password=post_passwd)
+        insert_account = Account(account=post_account, type=post_type, password=post_passwd)
         if post_type == 'student':
-            insert_user = Student(id=post_account, name=post_name, year=detail.get('year', 2018))
+            insert_user = Student(id=post_account, name=post_name, year=detail.get('year', 2017))
             print(insert_user)
             db.session.add(insert_user)
             db.session.commit()
