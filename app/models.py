@@ -81,7 +81,7 @@ class Course(db.Model):
     __tablename__ = 'courses'
     course_id = db.Column(db.String(13), unique=True, primary_key=True, index=True)
     course_name = db.Column(db.String(32), nullable=False)
-    teacher_id = db.Column(db.String(13), unique=True, primary_key=True, index=True)
+    teacher_id = db.Column(db.String(13), primary_key=True, index=True)
 
 
 # 学生-课堂表
@@ -92,4 +92,14 @@ class StuCourse(db.Model):
     course_id = db.Column(db.String(6), primary_key=True, nullable=False)
 
 
-
+@login_manager.user_loader
+def load_user(account):
+    account = Account.query.get(int(account))
+    if account.type == 'student':
+        return Student.query.get(int(account.account))
+    elif account.type == 'instructor':
+        return Instructor.query.get(int(account.account))
+    elif account.type == 'admin':
+        return Admin.query.get(int(account.account))
+    elif account in app.config['FLASKY_ADMIN']:
+        return account

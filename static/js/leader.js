@@ -13,13 +13,15 @@ const URLs = {
     stu_exam_info: Host + '/student/exam_info',
     stu_classes_list: Host + '/student/class_list',  // classes_list
     stu_change_selected: Host + '/student/choice_class',
-    stu_search: Host + 'student/join_class',
+    stu_search: Host + '/student/search_class',
+    stu_join: Host + '/student/join_class',
 
     tea_mine_class: Host + '/teacher/mine_class',
     tea_class_info: Host + '/teacher/class_info',
     tea_class_people: Host + '/teacher/class_people',
     tea_update_grade: Host + '/teacher/insert_grade',
     tea_exam_info: Host + '/teacher/exam_info',
+    tea_create_course: Host + '/teacher/create_course',
 
     admin_account_list: Host + '/admin/account_list',
     admin_change_account: Host + '/admin/change_account',
@@ -203,14 +205,18 @@ const Actions = {
         return data;
     },
     stu_search: function (){
-        let data = [];
+        let data = []
+        const post_data = {
+            'course_id': $('#stu-course-input').val()
+        };
         $.ajax({
             xhrFields: {
                 withCredentials: true
             },
             url: URLs.stu_search,
-            type: 'GET',
+            type: 'POST',
             async: false,
+            data: post_data,
             complete: function(jqXHR) {
                 if (200 === jqXHR.status) {
                     data = JSON.parse(jqXHR.responseText);
@@ -223,6 +229,31 @@ const Actions = {
             }
         });
         return data;
+    },
+    stu_join: function (){
+        const post_data = {
+            'course_id': $('#stu-course-input').val()
+        };
+        $.ajax({
+            xhrFields: {
+                withCredentials: true
+            },
+            url: URLs.stu_search,
+            type: 'POST',
+            async: false,
+            data: post_data,
+            complete: function(jqXHR) {
+                if (200 === jqXHR.status) {
+                    data = JSON.parse(jqXHR.responseText);
+                    alert("已成功添加该课程")
+                }
+                else if (400 === jqXHR.status) {
+                    alert('该课程号不存在，请重新搜索！')
+                }
+                else
+                    alert('未知错误，请稍后重试！');
+            }
+        });
     },
     stu_mine_grade: function() {
         let data = [];
@@ -916,10 +947,6 @@ function logout() {
 
 function stu_mine_class() {
     let mine_classes = Actions.stu_mine_class();
-    for (let i in mine_classes) {
-        mine_classes[i].day = Tools.get_weekday(mine_classes[i].day);
-        mine_classes[i].section = Tools.get_section(mine_classes[i].section);
-    }
     new Vue({
         el: '#mine_class-table',
         data: {
@@ -929,7 +956,20 @@ function stu_mine_class() {
     $('#mine_class-table tbody').show();
 }
 function stu_search() {
-    Actions.stu_search();
+    const stu_course_input = $('#stu-course-input');
+    let search_classes = Actions.stu_search();
+    console.log(search_classes);
+    new Vue({
+        el: '#search_class-table',
+        data: {
+            search_classes: search_classes
+        }
+    });
+    $('#search_class-table thead').show();
+    $('#search_class-table tbody').show();
+}
+function stu_join() {
+    Actions.stu_join();
 }
 function stu_mine_grade() {
     let mine_grade = Actions.stu_mine_grade();
@@ -1000,12 +1040,12 @@ function tea_load_classes_list() {
             course_count[data[i]['course_name']] += 1;
             data[i]['course_name'] += '_' + course_count[data[i]['course_name']].toString();
         }
-        $('#class_list-student').append('<dd><a href="./content/tea_students_list.html?class_id=' + data[i]['class_id'] + '" target="content">' + data[i]['course_name'] + '</a></dd>');
+        $('#class_list-student').append('<dd><a href="./content/tea_students_list.html?course_id=' + data[i]['course_id'] + '" target="content">' + data[i]['course_name'] + '</a></dd>');
     }
 }
 function tea_students_list() {
     const course_id = get_url_param('course_id');
-
+    console.log(course_id);
     // Class info.
     let data = Actions.tea_class_info();
     let class_info = new Vue({

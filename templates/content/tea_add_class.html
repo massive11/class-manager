@@ -1,39 +1,32 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>创建课程</title>
-  <link href="../../static/css/bootstrap.min.css" rel="stylesheet">
-  <link href="../../static/css/main.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/layui/css/layui.css">
+  <link rel="stylesheet" href="../../static/css/main.css">
+  <link rel="icon" href="../../static/img/title_logo.png">
 </head>
 <body class="content">
-<a class="btn btn-default hidden-print" href="#" onclick="window.print()" style="margin-bottom: 10px;"><span class="glyphicon glyphicon-print"></span> 打印</a>
-<table id="mine_class-table" class="table table-hover table-striped table-bordered table-condensed">
-  <thead>
-  <tr align="center">
-    <td colspan="4">课程信息</td>
-  </tr>
-  <tr>
-    <td>课程编号</td>
-    <td>课程名</td>
-  </tr>
-  </thead>
-  <tbody hidden>
-  <tr v-for="mine_class in mine_classes">
-    <td>{{ mine_class.course_id }}</td>
-    <td>{{ mine_class.course_name }}</td>
-  </tr>
-  </tbody>
-</table>
+    <div class="search-control">
+            <form>
+              <div class="form-group1">
+                <label for="id-input">请输入课程号： </label>
+                <input type="text" class="input-control" id="courseid-input" placeholder="课程号">
+              </div>
+                <div class="form-group2">
+                <label for="name-input">请输入课程名： </label>
+                <input type="text" class="input-control" id="coursename-input" placeholder="课程名">
+              </div>
+            </form>
+        <button type="button" class="search-button2" onclick="create()" style="width: 56px;height: 48px">创建</button>
+    </div>
 
 <!-- JavaScript -->
 <script src="../../static/js/vue.min.js"></script>
 <script src="../../static/js/jquery.min.js"></script>
 <script src="../../static/js/bootstrap.min.js"></script>
 <script src="../../static/js/leader.js"></script>
-<script>
-    tea_mine_class();
-</script>
 </body>
 </html>

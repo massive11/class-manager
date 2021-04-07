@@ -16,6 +16,9 @@ body.content {
 td.grade-td input {
     width: 100%;
 }
+div.form-group2{
+    margin-top: 20px;
+}
 input.input-control{
     outline-style: none ;
     border: 1px solid #ccc;
@@ -33,12 +36,20 @@ input.input-control:focus{
 }
 div.search-control{
     margin-left: 5%;
-    margin-top: 2%;
+    margin-top: 3%;
     font-size: 19px;
 }
 button.search-button{
+    margin-top: 20px;
     border-radius: 10%;
-    margin-left: -6px;
+    font-size: 17px;
+    background-color: #009f95;
+    color: white;
+}
+button.search-button2{
+    margin-top: 20px;
+    border-radius: 10%;
+    margin-left: 730px;
     font-size: 17px;
     background-color: #009f95;
     color: white;

@@ -15,9 +15,10 @@ def mine_class():
     result = []
     for mine_cla in mine_teachs:
         course_id = mine_cla.course_id
-        re = {'course_id': mine_cla.classes.course_id,
-              'course_name': mine_cla.classes.course_name}
+        re = {'course_id': course_id,
+              'course_name': mine_cla.course_name}
         result.append(re)
+        print(result)
     return jsonify(result)
 
 
@@ -36,6 +37,7 @@ def tea_class():
         }
     for keys in temp_re.keys():
         result.append(temp_re[keys])
+    print(result)
     return jsonify(result)
 
 
@@ -44,17 +46,19 @@ def tea_class():
 def class_info(course_id):
     if course_id is None:
         return jsonify({'message': 'no data'}), 401
+    print(course_id)
     teas = Course.query.filter_by(course_id=course_id).all()
-    if current_user.id not in [tea.teacher.id for tea in teas]:
+    print(teas)
+    if current_user.id not in [tea.teacher_id for tea in teas]:
         return jsonify({'message': 'you are not its teacher'}), 403
     student_infos = StuCourse.query.filter_by(course_id=course_id).all()
     result = []
     for student_info in student_infos:
-        stu = Student.query.filter_by(id=stu.uid).first()
-        re = {'student_id': student_info.uid,
-              'student_name': stu.name,
-              'grade': stu.year}
+        stu = Student.query.filter_by(id=student_info.uid).first()
+        re = {'student_id': stu.id,
+              'student_name': stu.name}
         result.append(re)
+    print(result)
     return jsonify(result)
 
 

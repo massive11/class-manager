@@ -8,20 +8,6 @@ import json
 login_manager.login_view = 'main.no_login'
 
 
-@login_manager.user_loader
-def load_user(account):
-    print("This is ...")
-    account = Account.query.get(int(account))
-    if account.type == 'student':
-        return Student.query.get(int(account.account))
-    elif account.type == 'instructor':
-        return Instructor.query.get(int(account.account))
-    elif account.type == 'admin':
-        return Admin.query.get(int(account.account))
-    elif account in app.config['FLASKY_ADMIN']:
-        return account
-
-
 @main.route('/')
 def hello():
     return 'hello world'
@@ -32,7 +18,7 @@ def no_login():
     return "no login", 401
 
 
-@main.route('/login', methods=['POST'])
+@main.route('/login', methods=['POST', 'GET'])
 def login():
     data = request.form
     account = data.get('account')
@@ -45,11 +31,12 @@ def login():
         if user.password == password:
             if user.type == 'student':
                 s = Student.query.filter_by(id=account).first()
-                a = login_user(s, remember=remember_me)
+                login_user(s, remember=remember_me)
                 print("Hello "+current_user.id)
                 return jsonify({'type': 'student'})
             if user.type == 'instructor':
                 i = Instructor.query.filter_by(id=account).first()
+                login_user(i, remember=remember_me)
                 return jsonify({'type': 'instructor'})
             if user.type == 'admin':
                 a = Admin.query.filter_by(id=account).first()
@@ -57,7 +44,7 @@ def login():
                 return jsonify({'type': 'admin'})
             if account in app.config['FLASKY_ADMIN']:
                 login_user(user, remember=remember_me)
-                return jsonify({'type:root'})
+                return jsonify({'type': 'root'})
             return jsonify({'message': 'type error'}), 400
         return jsonify({'message': 'password error'}), 403
     return jsonify({'message': 'no account'}), 404
@@ -85,8 +72,6 @@ def register():
 @main.route('/who_am_i', methods=['GET'])
 @login_required
 def who_am_i():
-    print("hi!")
-    print(current_user.id)
     return jsonify({"type": Account.query.filter_by(account=current_user.id).first().type,
                     "name": current_user.name})
 
