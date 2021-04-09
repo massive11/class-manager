@@ -411,12 +411,7 @@ const Actions = {
         });
         return data;
     },
-    tea_change: function(obj) {
-        const post_data = {
-            'student_id':  $(obj).parents("tr").find(".student-id").val(),
-            'student_answer': $(obj).parents("tr").find(".student-answer").val(),
-            'student_present': $(obj).parents("tr").find(".student-present").val(),
-        };
+    tea_change: function(post_data) {
         console.log(post_data)
         $.ajax({
             xhrFields: {
@@ -1128,11 +1123,16 @@ function tea_create_class() {
     courseid_input.val('');
     coursename_input.val('')
 }
-$('.search-button4').on('click',function()){
- let post_data = {
-  'id': $(this).parents("tr").find(".student-id").val(),
- }
-
+function tea_change(obj) {
+    let value = $(obj).parents("tr").find("td");
+    //console.log(value.eq(1).text()," ",value.eq(2).text());
+    let post_data = {
+        'student_id': value.eq(0).text(),
+        'student_answer': value.eq(2).text(),
+        'student_present': value.eq(3).text()
+    }
+    Actions.tea_change(post_data)
+}
 function tea_load_classes_list() {
     let data = Actions.tea_class_info();
     let course_count = {};
