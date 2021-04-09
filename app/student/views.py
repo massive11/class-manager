@@ -50,7 +50,17 @@ def search_class():
 @student.route('/join_class', methods=['GET', 'POST'])
 @login_required
 def join_class():
-    pass
+    data = request.form
+    course_id = data.get('course_id')
+    print(course_id)
+    course = Course.query.filter_by(course_id=course_id).first()
+    if course is None:
+        return jsonify({'message': 'course not exists'}), 400
+    else:
+        stuCourse = StuCourse(uid=current_user.id, course_id=course_id)
+        db.session.add(stuCourse)
+        db.session.commit()
+        return jsonify({'message': 'success'})
 
 
 # 退出课堂

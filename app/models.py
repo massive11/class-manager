@@ -50,10 +50,11 @@ class Student(db.Model, UserMixin, AnonymousUserMixin):
         nullable=False,
         index=True)
     name = db.Column(db.String(32), nullable=False)
-    year = db.Column(db.Integer, nullable=False)
+    answer = db.Column(db.Integer, nullable=False)
+    present = db.Column(db.Integer, nullable=False)
 
     def show(self):
-        return [self.id, self.name, self.year]
+        return [self.id, self.name, self.answer, self.present]
 
 
 # 教师表

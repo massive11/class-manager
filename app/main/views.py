@@ -59,7 +59,7 @@ def register():
     user = Account.query.filter_by(account=account).first()
     if user is None:
         user = Account(account=account, password=password, type='student')
-        u = Student(id=account, name=name, year=2017)
+        u = Student(id=account, name=name, answer=0, present=0)
         db.session.add(user)
         db.session.add(u)
         db.session.commit()

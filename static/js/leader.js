@@ -22,6 +22,8 @@ const URLs = {
     tea_update_grade: Host + '/teacher/insert_grade',
     tea_exam_info: Host + '/teacher/exam_info',
     tea_create_course: Host + '/teacher/create_course',
+    tea_get_name: Host + '/teacher/get_name',
+    tea_change: Host + '/teacher/change',
 
     admin_account_list: Host + '/admin/account_list',
     admin_change_account: Host + '/admin/change_account',
@@ -238,17 +240,16 @@ const Actions = {
             xhrFields: {
                 withCredentials: true
             },
-            url: URLs.stu_search,
+            url: URLs.stu_join,
             type: 'POST',
             async: false,
             data: post_data,
             complete: function(jqXHR) {
                 if (200 === jqXHR.status) {
-                    data = JSON.parse(jqXHR.responseText);
-                    alert("已成功添加该课程")
+                    alert("已成功加入该课程")
                 }
                 else if (400 === jqXHR.status) {
-                    alert('该课程号不存在，请重新搜索！')
+                    alert('添加课程失败，请稍后重试！')
                 }
                 else
                     alert('未知错误，请稍后重试！');
@@ -380,6 +381,91 @@ const Actions = {
             }
         });
         return data;
+    },
+    tea_get_name: function(course_id) {
+        let data = [];
+        const post_data = {
+            'course_id': course_id
+        };
+        $.ajax({
+            xhrFields: {
+                withCredentials: true
+            },
+            url: URLs.tea_get_name,
+            type: 'POST',
+            async: false,
+            data: post_data,
+            complete: function(jqXHR) {
+                if (200 === jqXHR.status) {
+                    data = JSON.parse(jqXHR.responseText);
+                    alert("请"+data['name']+"同学回答问题")
+                }
+                else if (400 === jqXHR.status) {
+                    alert('该课程没有学生！');
+                }
+                else if(404 === jqXHR.status)
+                    data = [];
+                else
+                    alert('未知错误，请稍后重试！');
+            }
+        });
+        return data;
+    },
+    tea_change: function(obj) {
+        const post_data = {
+            'student_id':  $(obj).parents("tr").find(".student-id").val(),
+            'student_answer': $(obj).parents("tr").find(".student-answer").val(),
+            'student_present': $(obj).parents("tr").find(".student-present").val(),
+        };
+        console.log(post_data)
+        $.ajax({
+            xhrFields: {
+                withCredentials: true
+            },
+            url: URLs.tea_change,
+            type: 'POST',
+            async: false,
+            data: post_data,
+            complete: function(jqXHR) {
+                if (200 === jqXHR.status) {
+                    alert("提交数据成功");
+                }
+                else if (400 === jqXHR.status) {
+                    alert('未知错误，请稍后重试！');
+                }
+                else if(404 === jqXHR.status)
+                    data = [];
+                else
+                    alert('未知错误，请稍后重试！');
+            }
+        });
+    },
+    tea_create_class: function() {
+        const post_data = {
+            'course_id': $('#courseid-input').val(),
+            'course_name': $('#coursename-input').val()
+        };
+        $.ajax({
+            xhrFields: {
+                withCredentials: true
+            },
+            url: URLs.tea_create_course,
+            type: 'POST',
+            async: false,
+            data: post_data,
+            complete: function(jqXHR) {
+                if (200 === jqXHR.status) {
+                    alert("课程创建成功")
+                }
+                else if (400 === jqXHR.status) {
+                    alert('课程号'+post_data["course_id"]+'已存在！');
+                }
+                else if(404 === jqXHR.status)
+                    data = [];
+                else
+                    alert('未知错误，请稍后重试！');
+            }
+        });
     },
     tea_class_info: function() {
         let data = [];
@@ -1028,6 +1114,25 @@ function tea_mine_class() {
     });
     $('#mine_class-table tbody').show();
 }
+function tea_create_class() {
+    const courseid_input = $('#courseid-input');
+    const coursename_input = $('#coursename-input');
+    // 参数检查
+    if (!courseid_input.val() || !coursename_input.val()) {
+        alert('信息不全，请填写完整后重试！');
+        return;
+    }
+    // 登录
+    Actions.tea_create_class();
+    // 善后，清空输入框
+    courseid_input.val('');
+    coursename_input.val('')
+}
+$('.search-button4').on('click',function()){
+ let post_data = {
+  'id': $(this).parents("tr").find(".student-id").val(),
+ }
+
 function tea_load_classes_list() {
     let data = Actions.tea_class_info();
     let course_count = {};
@@ -1042,6 +1147,10 @@ function tea_load_classes_list() {
         }
         $('#class_list-student').append('<dd><a href="./content/tea_students_list.html?course_id=' + data[i]['course_id'] + '" target="content">' + data[i]['course_name'] + '</a></dd>');
     }
+}
+function tea_get_name() {
+    const course_id = get_url_param('course_id');
+    Actions.tea_get_name(course_id);
 }
 function tea_students_list() {
     const course_id = get_url_param('course_id');

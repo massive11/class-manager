@@ -3,7 +3,7 @@ from ..models import *
 from flask_login import current_user, login_required
 from .. import app, db
 from . import teacher
-import json
+import random
 
 
 @teacher.route('/mine_class')
@@ -56,7 +56,9 @@ def class_info(course_id):
     for student_info in student_infos:
         stu = Student.query.filter_by(id=student_info.uid).first()
         re = {'student_id': stu.id,
-              'student_name': stu.name}
+              'student_name': stu.name,
+              'student_answer': stu.answer,
+              'student_present': stu.present}
         result.append(re)
     print(result)
     return jsonify(result)
@@ -78,11 +80,45 @@ def create_course():
         print("课程" + course_name + "创建成功！")
         return jsonify({'message': 'create course'})
     else:
-        return jsonify({'message': 'account exists'}), 400
+        return jsonify({'message': 'course exists'}), 400
 
 
-# 删除课程
-@teacher.route('/delete_course', methods=['GET', 'POST'])
+# 随机点名
+@teacher.route('/get_name', methods=['GET', 'POST'])
 @login_required
-def delete_course():
-    pass
+def get_name():
+    data = request.form
+    course_id = data.get('course_id')
+    print("course_id为："+course_id)
+    stus = StuCourse.query.filter_by(course_id=course_id).all()
+    print(stus)
+    if len(stus) > 0:
+        s = random.randint(1, len(stus))
+        a = 0
+        for stu in stus:
+            a += 1
+            if a == s:
+                stu_id = stu.uid
+                student = Student.query.filter_by(id=stu_id).first()
+                return jsonify({'name': student.name})
+    else:
+        return jsonify({'message': 'no student'}), 400
+
+
+# 创建课程
+@teacher.route('/change', methods=['GET', 'POST'])
+@login_required
+def change():
+    data = request.form
+    student_id = data.get('student_id')
+    student_answer = data.get('student_answer')
+    student_present = data.get('student_present')
+    student = Student.query.filter_by(id=student_id).first()
+    print(student_id)
+    if student is not None:
+        student.answer = student_answer
+        student.present = student_present
+        db.session.commit()
+        return jsonify({'message': 'success'})
+    else:
+        return jsonify({'message': 'something error'}), 400

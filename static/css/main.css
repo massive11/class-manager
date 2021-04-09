@@ -54,3 +54,15 @@ button.search-button2{
     background-color: #009f95;
     color: white;
 }
+button.search-button3{
+    border-radius: 10%;
+    font-size: 17px;
+    background-color: #009f95;
+    color: white;
+}
+button.search-button4{
+    border-radius: 10%;
+    font-size: 17px;
+    background-color: #009E94;
+    color: white;
+}

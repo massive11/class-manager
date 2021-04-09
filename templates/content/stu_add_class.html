@@ -32,11 +32,11 @@
   </thead>
   <tbody hidden>
     <tr v-for="search_classes">
-      <td>{{ search_classes.course_id }}</td>
+      <td id="td_search">{{ search_classes.course_id }}</td>
       <td>{{ search_classes.course_name }}</td>
       <td><span v-for="teacher in search_classes.teacher_name">{{ teacher }} </span></td>
         <td>
-      <button type="button" class="search-button" onclick="stu_join()" style="width: 40px;height: 35px">加入</button>
+      <button type="button" class="search-button3" onclick="stu_join()" style="width: 40px;height: 35px">加入</button>
     </td>
     </tr>
   </tbody>
